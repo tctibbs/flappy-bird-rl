@@ -9,6 +9,7 @@ dependencies = [
     "numpy>=2.2.1",
     "stable-baselines3>=2.4.0",
     "gymnasium>=1.0.0",
+    "pyyaml>=6.0",
 ]
 
 [project.optional-dependencies]

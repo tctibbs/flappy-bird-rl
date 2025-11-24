@@ -877,6 +877,7 @@ dependencies = [
     { name = "gymnasium" },
     { name = "numpy" },
     { name = "pygame" },
+    { name = "pyyaml" },
     { name = "stable-baselines3" },
 ]
 
@@ -892,6 +893,7 @@ requires-dist = [
     { name = "numpy", specifier = ">=2.2.1" },
     { name = "pre-commit", marker = "extra == 'dev'", specifier = ">=4.0.1" },
     { name = "pygame", specifier = ">=2.6.1" },
+    { name = "pyyaml", specifier = ">=6.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.12.11" },
     { name = "stable-baselines3", specifier = ">=2.4.0" },
 ]
