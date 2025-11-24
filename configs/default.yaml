@@ -1,0 +1,29 @@
+# Default DQN training configuration for Flappy Bird
+# This is the baseline configuration for initial experiments
+
+# Training parameters
+training:
+  total_timesteps: 100000
+  model_name: "dqn_flappybird"
+
+# DQN hyperparameters
+dqn:
+  policy: "MlpPolicy"
+  learning_rate: 0.0001
+  buffer_size: 10000
+  learning_starts: 1000
+  batch_size: 32
+  target_update_interval: 500
+  exploration_fraction: 0.1
+  exploration_final_eps: 0.05
+
+# Environment settings
+environment:
+  # Reward values
+  reward_alive: 1.0
+  reward_death: -100.0
+
+# Callback settings
+callback:
+  print_freq: 10
+  max_history: 100

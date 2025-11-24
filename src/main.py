@@ -1,55 +1,84 @@
-"""This is the main module of the reinforced_flapper program.
+"""Main entry point for Reinforced Flapper.
 
-It contains the entry point of the program, which initializes and starts the Flappy game.
+Supports three modes:
+- human: Play the game yourself
+- agent: Watch a trained agent play
+- agent_training: Train a new agent
 """
 
 import argparse
 
-from src.flappy_env import (
-    FlappyBirdEnv,  # Assuming you have this Gym environment defined
-)
+from src.agent import run_agent, train_agent
+from src.flappy_env import human_play
 
 
-def main(mode: str) -> None:
+def main() -> None:
     """Entry point of the program."""
-    if mode == "human":
-        human_mode()
+    args = parse_args()
 
-    elif mode == "agent" or mode == "agent_training":
-        pass
+    if args.mode == "human":
+        human_play()
 
+    elif args.mode == "agent_training":
+        train_agent(
+            config_path=args.config,
+            render=args.render,
+        )
 
-def human_mode() -> None:
-    """Runs the Flappy Bird game in human mode."""
-    FlappyBirdEnv()
-    env = FlappyBirdEnv()
-    env.reset()
-    env.splash()
-
-    running = True
-    while running:
-        running = env.render()
-
-    env.close()
+    elif args.mode == "agent":
+        run_agent(
+            model_path=args.model,
+            num_episodes=args.episodes,
+        )
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse command line arguments."""
-    parser = argparse.ArgumentParser(description="Flappy Bird Reinforcement Learning")
+    """Parse command line arguments.
+
+    Returns:
+        Parsed arguments.
+    """
+    parser = argparse.ArgumentParser(
+        description="Flappy Bird Reinforcement Learning",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+
     parser.add_argument(
         "mode",
         choices=["human", "agent", "agent_training"],
-        help="Mode to run the program in.\n"
-        "\t'human' for human play,\n"
-        "\t'agent' for agent play,\n"
-        "\t'agent_training' for training the agent.",
+        help="Mode to run: 'human' to play, 'agent' to watch trained model, "
+        "'agent_training' to train a new model",
     )
+
+    # Training arguments
+    parser.add_argument(
+        "--config",
+        type=str,
+        default="configs/default.yaml",
+        help="Path to training config YAML (default: configs/default.yaml)",
+    )
+    parser.add_argument(
+        "--render",
+        action="store_true",
+        help="Render the game during training to watch it learn",
+    )
+
+    # Inference arguments
+    parser.add_argument(
+        "--model",
+        type=str,
+        default="models/dqn_flappybird",
+        help="Path to trained model for agent mode (default: models/dqn_flappybird)",
+    )
+    parser.add_argument(
+        "--episodes",
+        type=int,
+        default=5,
+        help="Number of episodes to run in agent mode (default: 5)",
+    )
+
     return parser.parse_args()
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    if args.mode == "human":
-        main(args.mode)
-    else:
-        main(args.mode)
+    main()
