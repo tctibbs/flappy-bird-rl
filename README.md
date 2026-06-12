@@ -1,14 +1,14 @@
-# Reinforced Flapper
+# Flappy Bird RL
 
-[![CI](https://github.com/tctibbs/reinforced_flapper/actions/workflows/ci.yml/badge.svg)](https://github.com/tctibbs/reinforced_flapper/actions/workflows/ci.yml)
+[![CI](https://github.com/tctibbs/flappy-bird-rl/actions/workflows/ci.yml/badge.svg)](https://github.com/tctibbs/flappy-bird-rl/actions/workflows/ci.yml)
 
 A reproducible Flappy Bird reinforcement learning pipeline: Pygame game,
 Gymnasium environment, Stable-Baselines3 DQN, typed and hashed configs, a
 committed results ledger, and a fixed multi-seed evaluation protocol.
 
-Flappy Bird is a solved problem; the point of this repo is the pipeline
-done right. Every headline number traces to a ledger row carrying the git
-SHA, config hash, and seed that produced it.
+<p align="center">
+  <img src="docs/media/demo.gif" alt="Trained agent playing Flappy Bird" width="216">
+</p>
 
 ## Results
 
@@ -23,7 +23,6 @@ never died within the cap on any episode.
 | DQN (seed 1) | 255.00 | 255 | 255 | 255 | 100/100 |
 | DQN (seed 2) | 255.00 | 255 | 255 | 255 | 100/100 |
 | Random policy | 0.00 | 0 | 0 | 0 | 0/100 |
-| Prior shipped model | 0.00 | 0 | 0 | 0 | 0/100 |
 
 The solved target (mean and median score >= 100 per seed, all 3 seeds,
 [ADR 0005](docs/adr/0005-evaluation-protocol-and-solved-definition.md))
