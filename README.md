@@ -1,5 +1,7 @@
 # Reinforced Flapper
 
+[![CI](https://github.com/tctibbs/reinforced_flapper/actions/workflows/ci.yml/badge.svg)](https://github.com/tctibbs/reinforced_flapper/actions/workflows/ci.yml)
+
 A reproducible Flappy Bird reinforcement learning pipeline: Pygame game,
 Gymnasium environment, Stable-Baselines3 DQN, typed and hashed configs, a
 committed results ledger, and a fixed multi-seed evaluation protocol.
