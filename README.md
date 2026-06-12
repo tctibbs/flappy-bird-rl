@@ -2,9 +2,8 @@
 
 [![CI](https://github.com/tctibbs/flappy-bird-rl/actions/workflows/ci.yml/badge.svg)](https://github.com/tctibbs/flappy-bird-rl/actions/workflows/ci.yml)
 
-A reproducible Flappy Bird reinforcement learning pipeline: Pygame game,
-Gymnasium environment, Stable-Baselines3 DQN, typed and hashed configs, a
-committed results ledger, and a fixed multi-seed evaluation protocol.
+A DQN agent that learns to play Flappy Bird perfectly, and a clean,
+reproducible pipeline around it.
 
 <p align="center">
   <img src="docs/media/demo.gif" alt="Trained agent playing Flappy Bird" width="216">
@@ -12,35 +11,16 @@ committed results ledger, and a fixed multi-seed evaluation protocol.
 
 ## Results
 
-Fixed protocol: 100 episodes with paired seeds (episode i uses seed
-10000 + i), step cap 10000, deterministic policy, best checkpoint per run.
-Score is pipes passed. 255 is the measurement ceiling: it means the agent
-never died within the cap on any episode.
-
-| Policy | Mean | Median | Min | Max | Capped episodes |
-|---|---|---|---|---|---|
-| DQN (seed 0) | 255.00 | 255 | 255 | 255 | 100/100 |
-| DQN (seed 1) | 255.00 | 255 | 255 | 255 | 100/100 |
-| DQN (seed 2) | 255.00 | 255 | 255 | 255 | 100/100 |
-| Random policy | 0.00 | 0 | 0 | 0 | 0/100 |
-
-The solved target (mean and median score >= 100 per seed, all 3 seeds,
-[ADR 0005](docs/adr/0005-evaluation-protocol-and-solved-definition.md))
-is met at the ceiling on every seed. Training takes about
-5 minutes per seed on a laptop CPU (1M steps, headless). Stochastic
-evaluation (epsilon-greedy at the saved 0.01 exploration rate) scores 13
-to 18 and is reported separately in the ledger; a 1 percent random flap
-rate is lethal in this game regardless of policy quality.
+All 3 training seeds reach perfect play: the best checkpoint never dies
+in evaluation, scoring 255 pipes on every one of 100 fixed episodes (the
+protocol's ceiling). A random policy scores 0 on the same episodes.
 
 ![Learning curves](plots/learning_curves.png)
 
-The live DQN policy keeps oscillating after first reaching perfect play,
-which is why checkpoints are selected by periodic evaluation score rather
-than taking the final network. The decisive hyperparameter was reward
-scale: the original +1 alive / -100 death reward never exceeded mean 1.77,
-while +0.1 / -1.0 with the same algorithm and budget reached the ceiling
-([journal 003](journal/003-reward-scale-was-the-whole-problem.md),
-[ADR 0007](docs/adr/0007-bounded-reward-scale.md)).
+Training takes about 5 minutes per seed on a laptop CPU, fully headless.
+The one hyperparameter that mattered was reward scale: +1 per frame and
+-100 on death never worked, +0.1 and -1.0 solved the game
+([journal](journal/003-reward-scale-was-the-whole-problem.md)).
 
 ## Quick start
 
@@ -49,65 +29,27 @@ Requires [uv](https://docs.astral.sh/uv/).
 ```bash
 uv sync --all-extras
 
-# Play the game yourself
-uv run flapper play
-
-# Train (headless, no display needed), then watch the result
-uv run flapper train --config configs/final.yaml --seed 0
-uv run flapper watch --model runs/<run_id>/best_model
-
-# Evaluate under the fixed protocol (appends a ledger row)
-uv run flapper evaluate --model runs/<run_id>/best_model
-uv run flapper evaluate --policy random
-
-# Record an mp4 (works headless) and plot curves
-uv run flapper video --model runs/<run_id>/best_model
-uv run flapper plot --runs runs/<run_id> --target 100
+uv run flapper play                                       # play it yourself
+uv run flapper train --config configs/final.yaml          # train an agent
+uv run flapper watch --model runs/<run_id>/best_model     # watch it play
+uv run flapper evaluate --model runs/<run_id>/best_model  # 100-episode eval
 ```
 
-`make check` runs the full quality gate: ruff check, ruff format --check,
-ty check, pytest.
+`make check` runs lint, format, types, and tests.
 
-## How it fits together
+## How it works
 
-```
-src/reinforced_flapper/
-  game/        Pygame game: entities, pixel-perfect collision, assets.
-               Fully display-free when not rendering (docs/adr/0004).
-  env.py       Gymnasium env. 4-feature observation, config-driven
-               rewards, step-cap truncation, per-env seeded RNG.
-  config.py    Pydantic v2 schema. Hashed (seed and name excluded) so
-               every result traces to an exact configuration.
-  ledger.py    Append-only results/ledger.jsonl, the source of truth.
-  evaluate.py  Fixed paired-seed protocol; deterministic and stochastic
-               evaluations kept separate.
-  train.py     Training loop. Each run writes runs/<run_id>/ with config,
-               structured log, monitor.csv, learning curve, best and
-               final models, and appends a ledger row.
-  video.py     Offscreen mp4 recording.
-  plots.py     Learning curves and final-score plots.
-  cli.py       The flapper command.
-```
+- The bird sees 4 numbers (height, velocity, distance to the next pipe,
+  distance to the gap center) and decides each frame: flap or not.
+- Stable-Baselines3 DQN, trained headless, evaluated on 100 fixed-seed
+  episodes so every policy faces the same pipes.
+- Every run records its typed, hashed config and results to
+  results/ledger.jsonl, so each number traces to an exact configuration
+  and git commit.
 
-Decisions are recorded in docs/adr (algorithm, observation, rewards,
-headless design, evaluation protocol, ledger). Experiment lessons live in
-journal/, one per file.
-
-## Reproducing
-
-Every ledger row embeds its full config. To reproduce a row: check out
-its git_sha, write its config to a YAML file (or use the matching file in
-configs/), and run `uv run flapper train --config <file> --seed <seed>`.
-Training is deterministic per seed up to PyTorch nondeterminism on
-differing hardware; the evaluation protocol itself is exactly
-reproducible for a given model.
-
-The environment observation is 4 normalized features: bird height, bird
-vertical velocity, horizontal distance to the next pipe, and vertical
-distance to the gap center. Action space is flap / no flap at 30 frames
-per second of game time.
+More detail: [method and results](docs/summary.md),
+[decision records](docs/adr), [experiment journal](journal).
 
 ## License
 
-MIT, see LICENSE. Game assets and base game derive from
-[FlapPyBird](https://github.com/sourabhv/FlapPyBird).
+MIT. Game derived from [FlapPyBird](https://github.com/sourabhv/FlapPyBird).

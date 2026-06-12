@@ -31,8 +31,16 @@ def _load_curve(run_dir: Path) -> tuple[np.ndarray, np.ndarray]:
     return steps, means
 
 
+SEED_COLORS = ("#4C72B0", "#DD8452", "#55A868", "#C44E52", "#8172B3")
+PERFECT_SCORE = 255
+
+
 def plot_learning_curves(run_dirs: list[Path], out_path: Path) -> Path:
-    """Plot per-seed learning curves with a mean band.
+    """Plot best-checkpoint-so-far curves per seed, raw evals faint behind.
+
+    The live DQN policy oscillates, so the curve that matters (and the one
+    the pipeline actually uses for checkpoint selection) is the running
+    best of the periodic evaluations.
 
     Args:
         run_dirs: Run directories, one per seed.
@@ -41,30 +49,41 @@ def plot_learning_curves(run_dirs: list[Path], out_path: Path) -> Path:
     Returns:
         The written plot path.
     """
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(9, 4.5))
 
-    curves = []
-    for run_dir in run_dirs:
+    for run_dir, color in zip(run_dirs, SEED_COLORS, strict=False):
         steps, means = _load_curve(run_dir)
         seed = _run_seed(run_dir)
-        ax.plot(steps, means, alpha=0.5, linewidth=1, label=f"seed {seed}")
-        curves.append((steps, means))
+        millions = steps / 1e6
+        ax.plot(millions, means, color=color, alpha=0.22, linewidth=1)
+        ax.plot(
+            millions,
+            np.maximum.accumulate(means),
+            color=color,
+            linewidth=2.2,
+            label=f"seed {seed}",
+        )
 
-    # Aggregate onto the shortest common grid (same eval cadence per seed).
-    n_common = min(len(c[0]) for c in curves)
-    if n_common > 1 and len(curves) > 1:
-        grid = curves[0][0][:n_common]
-        stacked = np.stack([c[1][:n_common] for c in curves])
-        mean = stacked.mean(axis=0)
-        std = stacked.std(axis=0, ddof=1) if len(curves) > 1 else np.zeros_like(mean)
-        ax.plot(grid, mean, color="black", linewidth=2, label="mean")
-        ax.fill_between(grid, mean - std, mean + std, color="black", alpha=0.15)
+    ax.axhline(
+        PERFECT_SCORE, color="#999999", linestyle="--", linewidth=1, zorder=0
+    )
+    ax.text(
+        0.02,
+        PERFECT_SCORE - 6,
+        "perfect play (eval ceiling)",
+        color="#777777",
+        fontsize=9,
+        va="top",
+    )
 
-    ax.set_xlabel("Environment steps")
-    ax.set_ylabel("Eval score (mean over eval episodes)")
-    ax.set_title("Learning curves, deterministic periodic evaluation")
-    ax.legend()
-    ax.grid(alpha=0.3)
+    ax.set_xlabel("Environment steps (millions)")
+    ax.set_ylabel("Eval score (pipes passed)")
+    ax.set_title("Best checkpoint so far (bold), raw periodic evals (faint)")
+    ax.set_ylim(bottom=-8)
+    ax.legend(frameon=False, loc="center left")
+    ax.grid(axis="y", alpha=0.25)
+    ax.spines["top"].set_visible(False)
+    ax.spines["right"].set_visible(False)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     fig.tight_layout()
     fig.savefig(out_path, dpi=150)

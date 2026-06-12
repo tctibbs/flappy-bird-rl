@@ -74,6 +74,15 @@ single process, laptop CPU, headless.
    not a convenience. The final network at 1M steps is often mediocre;
    the best checkpoint is consistently perfect (journal/004).
 
+## Reproducing
+
+Every ledger row embeds its full config. To reproduce a row: check out
+its git_sha, write its config to a YAML file (or use the matching file in
+configs/), and run `uv run flapper train --config <file> --seed <seed>`.
+Training is deterministic per seed up to PyTorch nondeterminism on
+differing hardware; the evaluation protocol itself is exactly
+reproducible for a given model.
+
 ## Artifacts
 
 - results/ledger.jsonl: every training and evaluation row, with git SHA,
