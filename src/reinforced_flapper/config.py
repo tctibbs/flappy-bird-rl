@@ -144,12 +144,16 @@ class RunConfig(StrictModel):
             yaml.safe_dump(self.model_dump(mode="json"), f, sort_keys=False)
 
     def config_hash(self) -> str:
-        """Hash the config, excluding the training seed.
+        """Hash the behavior-affecting config fields.
+
+        The training seed and the name label are excluded, so seed
+        replicates and renamed copies of the same setup share a hash.
 
         Returns:
             First 12 hex characters of the sha256 of the canonical JSON.
         """
         data = self.model_dump(mode="json")
+        data.pop("name")
         data["train"].pop("seed")
         canonical = json.dumps(data, sort_keys=True)
         return hashlib.sha256(canonical.encode()).hexdigest()[:12]

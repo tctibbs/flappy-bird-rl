@@ -44,10 +44,10 @@ def test_hash_is_stable() -> None:
     assert RunConfig().config_hash() == RunConfig().config_hash()
 
 
-def test_hash_ignores_seed() -> None:
-    """Seed replicates of the same config share a hash."""
+def test_hash_ignores_seed_and_name() -> None:
+    """Seed replicates and renamed copies of the same config share a hash."""
     a = RunConfig()
-    b = RunConfig()
+    b = RunConfig(name="renamed")
     b.train.seed = 99
     assert a.config_hash() == b.config_hash()
 
