@@ -1,7 +1,6 @@
-# Baseline DQN configuration. Schema: reinforced_flapper.config.RunConfig.
-# Every field is validated on load; unknown fields are rejected.
+# Screening config B: original reward scale, lower learning rate, longer run.
 
-name: dqn_baseline
+name: screen_b_original_reward
 
 env:
   reward_alive: 1.0
@@ -11,7 +10,7 @@ env:
 
 dqn:
   policy: MlpPolicy
-  learning_rate: 0.0003
+  learning_rate: 0.0001
   buffer_size: 100000
   learning_starts: 5000
   batch_size: 64
@@ -19,14 +18,14 @@ dqn:
   train_freq: 4
   gradient_steps: 1
   target_update_interval: 1000
-  exploration_fraction: 0.2
-  exploration_final_eps: 0.02
+  exploration_fraction: 0.1
+  exploration_final_eps: 0.01
   net_arch: [256, 256]
 
 train:
-  total_timesteps: 300000
+  total_timesteps: 1000000
   seed: 0
-  eval_every_steps: 20000
+  eval_every_steps: 50000
   eval_episodes: 20
 
 evaluation:

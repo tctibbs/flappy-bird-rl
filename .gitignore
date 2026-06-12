@@ -68,8 +68,6 @@ poetry.lock
 # Jupyter Notebook
 .ipynb_checkpoints
 
-# pyenv
-.python-version
 
 # Environment variables
 .env
@@ -92,3 +90,7 @@ tensorboard/
 
 # Claude Code project instructions
 CLAUDE.md
+
+# Run artifacts (models and per-run outputs stay out of git; the ledger is committed)
+runs/
+videos/
