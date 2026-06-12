@@ -64,9 +64,7 @@ def plot_learning_curves(run_dirs: list[Path], out_path: Path) -> Path:
             label=f"seed {seed}",
         )
 
-    ax.axhline(
-        PERFECT_SCORE, color="#999999", linestyle="--", linewidth=1, zorder=0
-    )
+    ax.axhline(PERFECT_SCORE, color="#999999", linestyle="--", linewidth=1, zorder=0)
     ax.text(
         0.02,
         PERFECT_SCORE - 6,
