@@ -21,6 +21,13 @@ from reinforced_flapper.game.constants import BACKGROUNDS, PIPES, PLAYERS
 # so the path is anchored to the source tree.
 ASSETS_DIR = Path(__file__).resolve().parents[3] / "assets"
 
+if not pygame.image.get_extended():
+    raise ImportError(
+        "This pygame build lacks extended image support and cannot load PNG "
+        "sprites. Use a Python version covered by requires-python (see "
+        ".python-version), where pygame wheels ship with SDL_image."
+    )
+
 
 def load_sprite(name: str, *, convert: bool) -> pygame.Surface:
     """Load a sprite with per-pixel alpha.

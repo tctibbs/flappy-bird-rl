@@ -3,7 +3,7 @@ name = "reinforced-flapper"
 version = "0.2.0"
 description = "Reproducible Flappy Bird reinforcement learning pipeline using Gymnasium and Stable-Baselines3"
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.14"
 dependencies = [
     "pygame>=2.6.1",
     "numpy>=2.2.1",
