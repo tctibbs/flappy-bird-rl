@@ -23,8 +23,6 @@ Keep DQN on Stable-Baselines3, with hyperparameters as typed config fields.
 - DQN is off-policy and replay-based, which suits this cheap, serial,
   headless environment. PPO's main advantage (stable on-policy updates
   with many parallel envs) buys little here.
-- The prior model in the repo is a DQN, so the starting line and the new
-  result stay directly comparable.
 
 ## Consequences
 

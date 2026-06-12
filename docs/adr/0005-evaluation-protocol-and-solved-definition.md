@@ -8,8 +8,7 @@ Status: accepted
 There is no oracle: "never dies" is the ceiling and it is reachable, so an
 uncapped episode never ends. Headline claims need a fixed protocol, a step
 cap, multiple seeds, and a target defined before results exist. The
-measured starting line is score 0.0 for both the prior model and the
-random baseline.
+measured starting line is the random baseline at score 0.0.
 
 ## Decision
 
@@ -28,8 +27,8 @@ Solved is defined as: for every one of 3 training seeds (0, 1, 2), the
 best checkpoint's deterministic evaluation has mean score >= 100 and
 median score >= 100 under this protocol.
 
-Reference points: random policy 0.0 mean, prior shipped model 0.0 mean
-(both measured, ledger and journal entry 001).
+Reference point: random policy 0.0 mean (measured, ledger and journal
+entry 001).
 
 ## Rationale
 

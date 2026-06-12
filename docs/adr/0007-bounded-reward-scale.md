@@ -28,7 +28,7 @@ reward_death = -1.0. This is a scale change only: the optimal policy
   rewards to [-1, 1]. The screening result reproduced this textbook
   effect cleanly.
 - Game score remains the evaluation metric, so comparisons against the
-  random baseline and the prior model are unaffected by the reward change.
+  random baseline are unaffected by the reward change.
 
 ## Consequences
 

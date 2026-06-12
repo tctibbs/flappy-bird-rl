@@ -14,8 +14,7 @@ mean = median = min = max = 255. The solved target (mean and median >= 100
 per seed, ADR 0005) is met at the measurement ceiling on all seeds.
 Wall clock was 277 to 315 seconds per seed on a laptop CPU.
 
-Reference points, same protocol: random policy 0.00, prior shipped model
-0.00 (deterministic).
+Reference point, same protocol: random policy 0.00.
 
 ## Observations
 

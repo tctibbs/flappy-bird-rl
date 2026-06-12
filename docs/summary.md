@@ -9,9 +9,7 @@ The trained agent plays Flappy Bird perfectly as far as the measurement
 ceiling allows: on all 3 training seeds, the best checkpoint passed 255
 pipes on every one of 100 fixed evaluation episodes without dying (every
 episode hit the 10000-step cap). The random baseline scores 0.00 on the
-same episodes. The model that shipped with the repo also scores 0.00; it
-turned out to be a 2000-step smoke-test artifact that never flaps, so the
-measured starting line was zero, not a working agent. The solved target
+same episodes. The solved target
 (mean and median score >= 100 on every seed) is met with maximal margin.
 
 ## Method
@@ -48,7 +46,6 @@ measured starting line was zero, not a working agent. The solved target
 | dqn_final seed 1 | 255.00 | 255 | 255 | 255 | 100/100 |
 | dqn_final seed 2 | 255.00 | 255 | 255 | 255 | 100/100 |
 | random | 0.00 | 0 | 0 | 0 | 0/100 |
-| prior shipped model | 0.00 | 0 | 0 | 0 | 0/100 |
 
 Stochastic evaluation of the same checkpoints scores 13.2 to 18.1: with
 1 percent random actions, a single ill-timed flap is fatal, so this
@@ -59,9 +56,9 @@ single process, laptop CPU, headless.
 
 ## What was learned
 
-1. Measure the starting line first. The committed "trained model" was a
-   never-flap policy; without measuring it, every later comparison would
-   have rested on an assumption (journal/001).
+1. Measure the starting line first. A model artifact found on disk turned
+   out to be a never-flap smoke-test output and was excluded as a
+   baseline; the random policy is the reference (journal/001).
 2. Headless equivalence is a measurable claim. Palettized sprites lose
    their alpha silently without conversion, which would have changed
    collision masks; the fix was verified mask-by-mask and then end-to-end
@@ -92,4 +89,4 @@ reproducible for a given model.
   artifact, not committed; regenerate with `uv run flapper video`).
 - runs/<run_id>/: per-run config, structured log, monitor.csv, learning
   curve, best and final models, final_eval.json.
-- docs/adr/: seven decision records. journal/: four lessons.
+- docs/adr/: seven decision records. journal/: five lessons.

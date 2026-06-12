@@ -2,8 +2,7 @@
 
 [![CI](https://github.com/tctibbs/flappy-bird-rl/actions/workflows/ci.yml/badge.svg)](https://github.com/tctibbs/flappy-bird-rl/actions/workflows/ci.yml)
 
-A DQN agent that learns to play Flappy Bird perfectly, and a clean,
-reproducible pipeline around it.
+A DQN agent that learns to play Flappy Bird.
 
 <p align="center">
   <img src="docs/media/demo.gif" alt="Trained agent playing Flappy Bird" width="216">

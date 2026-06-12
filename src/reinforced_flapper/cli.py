@@ -172,7 +172,7 @@ def cmd_plot(args: argparse.Namespace) -> None:
         if row.kind == "train" and any(row.run_id == d.name for d in run_dirs)
     ]
     if rows:
-        baselines = {"random": 0.0, "prior model": 0.0}
+        baselines = {"random": 0.0}
         scores_path = plot_final_scores(
             rows, baselines, out_dir / "final_scores.png", target=args.target
         )
