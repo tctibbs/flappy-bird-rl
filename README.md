@@ -24,7 +24,8 @@ never died within the cap on any episode.
 | Prior shipped model | 0.00 | 0 | 0 | 0 | 0/100 |
 
 The solved target (mean and median score >= 100 per seed, all 3 seeds,
-docs/adr/0005) is met at the ceiling on every seed. Training takes about
+[ADR 0005](docs/adr/0005-evaluation-protocol-and-solved-definition.md))
+is met at the ceiling on every seed. Training takes about
 5 minutes per seed on a laptop CPU (1M steps, headless). Stochastic
 evaluation (epsilon-greedy at the saved 0.01 exploration rate) scores 13
 to 18 and is reported separately in the ledger; a 1 percent random flap
@@ -37,7 +38,8 @@ which is why checkpoints are selected by periodic evaluation score rather
 than taking the final network. The decisive hyperparameter was reward
 scale: the original +1 alive / -100 death reward never exceeded mean 1.77,
 while +0.1 / -1.0 with the same algorithm and budget reached the ceiling
-(journal/003, docs/adr/0007).
+([journal 003](journal/003-reward-scale-was-the-whole-problem.md),
+[ADR 0007](docs/adr/0007-bounded-reward-scale.md)).
 
 ## Quick start
 
