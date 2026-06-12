@@ -56,9 +56,9 @@ single process, laptop CPU, headless.
 
 ## What was learned
 
-1. Measure the starting line first. A model artifact found on disk turned
-   out to be a never-flap smoke-test output and was excluded as a
-   baseline; the random policy is the reference (journal/001).
+1. Measure the starting line first. The random baseline, episode seeds,
+   and step cap were fixed and recorded before any training run, so every
+   claim is relative to a measured reference (journal/001).
 2. Headless equivalence is a measurable claim. Palettized sprites lose
    their alpha silently without conversion, which would have changed
    collision masks; the fix was verified mask-by-mask and then end-to-end

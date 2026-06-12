@@ -7,10 +7,10 @@ Git SHA: 7cb7921 (pipeline rebuild)
 
 The whole pipeline was rebuilt (typed config, ledger, headless env,
 fixed protocol) while keeping the game dynamics bit-for-bit identical.
-The proof is paired evaluation: the random baseline and the untrained
-model artifact from entry 001 were re-run under the new environment with the same episode seeds, and
-produced identical per-episode score lists and identical mean lengths
-(31.0 deterministic, 72.0 random) to the pre-refactor measurement.
+The proof is paired evaluation: the baseline policies from entry 001 were
+re-run under the new environment with the same episode seeds and produced
+identical per-episode score and length lists (random baseline mean length
+exactly 72.0) to the pre-refactor measurement.
 
 ## Lessons
 
