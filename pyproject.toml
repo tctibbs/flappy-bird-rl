@@ -1,29 +1,43 @@
 [project]
 name = "reinforced-flapper"
-version = "0.1.0"
-description = "Reinforcement learning agent for Flappy Bird using Gymnasium and Stable-Baselines3"
+version = "0.2.0"
+description = "Reproducible Flappy Bird reinforcement learning pipeline using Gymnasium and Stable-Baselines3"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "pygame>=2.6.1",
     "numpy>=2.2.1",
-    "stable-baselines3>=2.4.0",
-    "gymnasium>=1.0.0",
-    "pyyaml>=6.0",
+    "stable-baselines3>=2.7.0",
+    "gymnasium>=1.2.0",
+    "pyyaml>=6.0.2",
+    "pydantic>=2.11.0",
+    "loguru>=0.7.3",
+    "matplotlib>=3.10.0",
+    "imageio>=2.37.0",
+    "imageio-ffmpeg>=0.6.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "ruff>=0.12.11",
+    "ruff>=0.14.3",
+    "ty>=0.0.1a21",
+    "pytest>=8.3.0",
     "pre-commit>=4.0.1",
 ]
+
+[project.scripts]
+flapper = "reinforced_flapper.cli:main"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src"]
+packages = ["src/reinforced_flapper"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
 
 [tool.ruff]
 line-length = 88
@@ -65,23 +79,18 @@ unfixable = [
     "F401",  # Prevent auto-removal of unused imports while editing
 ]
 
-# Google-style docstring configuration
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
-# Import sorting configuration
 [tool.ruff.lint.isort]
 force-sort-within-sections = true
 
-# Tidy imports configuration
 [tool.ruff.lint.flake8-tidy-imports]
 ban-relative-imports = "all"
 
-# Code formatting configuration
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
 
-# Per-file ignores
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401"]

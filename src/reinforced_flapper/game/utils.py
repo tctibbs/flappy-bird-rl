@@ -1,4 +1,4 @@
-"""Utility functions for game operations."""
+"""Utility functions for game geometry and collision."""
 
 from collections.abc import Callable
 from functools import wraps
@@ -10,13 +10,29 @@ HitMaskType = list[list[bool]]
 
 
 def clamp(n: float, minn: float, maxn: float) -> float:
-    """Clamps a number between two values."""
+    """Clamp a number between two values.
+
+    Args:
+        n: The value to clamp.
+        minn: Lower bound.
+        maxn: Upper bound.
+
+    Returns:
+        The clamped value.
+    """
     return max(min(maxn, n), minn)
 
 
 def memoize(func: Callable) -> Callable:
-    """Memoization decorator for functions taking one or more arguments."""
-    cache = {}
+    """Memoize a function on its arguments.
+
+    Args:
+        func: The function to memoize.
+
+    Returns:
+        The wrapped function.
+    """
+    cache: dict[Any, Any] = {}
 
     @wraps(func)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
@@ -30,7 +46,14 @@ def memoize(func: Callable) -> Callable:
 
 @memoize
 def get_hit_mask(image: pygame.Surface) -> HitMaskType:
-    """Returns a hit mask using an image's alpha."""
+    """Build a hit mask from an image's per-pixel alpha.
+
+    Args:
+        image: Surface with per-pixel alpha.
+
+    Returns:
+        Column-major grid of booleans, True where the pixel is opaque.
+    """
     return [
         [bool(image.get_at((x, y))[3]) for y in range(image.get_height())]
         for x in range(image.get_width())
@@ -43,13 +66,16 @@ def pixel_collision(
     hitmask1: HitMaskType,
     hitmask2: HitMaskType,
 ) -> bool:
-    """Checks if two objects collide and not just their rects.
+    """Check whether two objects overlap on opaque pixels, not just rects.
 
     Args:
         rect1: The first object's rect.
         rect2: The second object's rect.
-        hitmask1: The first object's hitmask.
-        hitmask2: The second object's hitmask.
+        hitmask1: The first object's hit mask.
+        hitmask2: The second object's hit mask.
+
+    Returns:
+        True if any opaque pixels overlap.
     """
     rect = rect1.clip(rect2)
 

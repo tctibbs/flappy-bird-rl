@@ -1,14 +1,18 @@
-"""Player entity module."""
+"""Player (bird) entity."""
 
 from enum import Enum
 from itertools import cycle
+from typing import TYPE_CHECKING
 
 import pygame
 
-from src.entities.entity import Entity
-from src.entities.floor import Floor
-from src.entities.pipe import Pipe, Pipes
-from src.utils import GameConfig, clamp
+from reinforced_flapper.game.entities.entity import Entity
+from reinforced_flapper.game.entities.floor import Floor
+from reinforced_flapper.game.entities.pipe import Pipe, Pipes
+from reinforced_flapper.game.utils import clamp
+
+if TYPE_CHECKING:
+    from reinforced_flapper.game.core import GameConfig
 
 
 class PlayerMode(Enum):
@@ -20,21 +24,22 @@ class PlayerMode(Enum):
 
 
 class Player(Entity):
-    """Player entity.
+    """The bird.
 
     Attributes:
-        mode: Player mode.
-        min_y: Minimum Y position.
-        max_y: Maximum Y position.
-        img_idx: Image index.
-        img_gen: Image generator.
-        frame: Frame count.
-        crashed: True if player crashed.
-        crash_entity: Entity with which player crashed.
+        mode: Current player mode.
+        min_y: Minimum y position.
+        max_y: Maximum y position.
+        crashed: True once the player has collided.
+        crash_entity: What the player collided with ("pipe" or "floor").
     """
 
-    def __init__(self, config: GameConfig) -> None:
-        """Initialize the player."""
+    def __init__(self, config: "GameConfig") -> None:
+        """Initialize the player.
+
+        Args:
+            config: Shared game context.
+        """
         image = config.images.player[0]
         x = int(config.window.width * 0.2)
         y = int((config.window.height - image.get_height()) / 2)
@@ -45,11 +50,15 @@ class Player(Entity):
         self.img_gen = cycle([0, 1, 2, 1])
         self.frame = 0
         self.crashed = False
-        self.crash_entity = None
+        self.crash_entity: str | None = None
         self.set_mode(PlayerMode.SHM)
 
     def set_mode(self, mode: PlayerMode) -> None:
-        """Set the player mode."""
+        """Switch the player mode and reset mode-specific physics.
+
+        Args:
+            mode: The mode to switch to.
+        """
         self.mode = mode
         if mode == PlayerMode.NORMAL:
             self.reset_vals_normal()
@@ -64,51 +73,51 @@ class Player(Entity):
             self.reset_vals_crash()
 
     def reset_vals_normal(self) -> None:
-        """Reset player values for normal mode."""
-        self.vel_y = -9  # player's velocity along Y axis
-        self.max_vel_y = 10  # max vel along Y, max descend speed
-        self.min_vel_y = -8  # min vel along Y, max ascend speed
-        self.acc_y = 1  # players downward acceleration
+        """Reset physics values for normal play."""
+        self.vel_y = -9  # velocity along Y axis
+        self.max_vel_y = 10  # max descend speed
+        self.min_vel_y = -8  # max ascend speed
+        self.acc_y = 1  # downward acceleration
 
-        self.rot = 80  # player's current rotation
-        self.vel_rot = -3  # player's rotation speed
-        self.rot_min = -90  # player's min rotation angle
-        self.rot_max = 20  # player's max rotation angle
+        self.rot = 80  # current rotation
+        self.vel_rot = -3  # rotation speed
+        self.rot_min = -90  # min rotation angle
+        self.rot_max = 20  # max rotation angle
 
-        self.flap_acc = -9  # players speed on flapping
-        self.flapped = False  # True when player flaps
+        self.flap_acc = -9  # velocity gained on flap
+        self.flapped = False  # True for the frame after a flap
 
     def reset_vals_shm(self) -> None:
-        """Reset player values for SHM mode."""
-        self.vel_y = 1  # player's velocity along Y axis
-        self.max_vel_y = 4  # max vel along Y, max descend speed
-        self.min_vel_y = -4  # min vel along Y, max ascend speed
-        self.acc_y = 0.5  # players downward acceleration
+        """Reset physics values for splash-screen bobbing."""
+        self.vel_y = 1
+        self.max_vel_y = 4
+        self.min_vel_y = -4
+        self.acc_y = 0.5
 
-        self.rot = 0  # player's current rotation
-        self.vel_rot = 0  # player's rotation speed
-        self.rot_min = 0  # player's min rotation angle
-        self.rot_max = 0  # player's max rotation angle
+        self.rot = 0
+        self.vel_rot = 0
+        self.rot_min = 0
+        self.rot_max = 0
 
-        self.flap_acc = 0  # players speed on flapping
-        self.flapped = False  # True when player flaps
+        self.flap_acc = 0
+        self.flapped = False
 
     def reset_vals_crash(self) -> None:
-        """Reset player values for crash mode."""
+        """Reset physics values for the crash fall."""
         self.acc_y = 2
         self.vel_y = 7
         self.max_vel_y = 15
         self.vel_rot = -8
 
     def tick_shm(self) -> None:
-        """Update player position in SHM mode."""
+        """Update position in SHM mode."""
         if self.vel_y >= self.max_vel_y or self.vel_y <= self.min_vel_y:
             self.acc_y *= -1
         self.vel_y += self.acc_y
         self.y += self.vel_y
 
     def tick_normal(self) -> None:
-        """Update player position in normal mode."""
+        """Update position in normal mode."""
         if self.vel_y < self.max_vel_y and not self.flapped:
             self.vel_y += self.acc_y
         if self.flapped:
@@ -118,23 +127,22 @@ class Player(Entity):
         self.rotate()
 
     def tick_crash(self) -> None:
-        """Update player position in crash mode."""
+        """Update position in crash mode."""
         if self.min_y <= self.y <= self.max_y:
             self.y = clamp(self.y + self.vel_y, self.min_y, self.max_y)
             # rotate only when it's a pipe crash and bird is still falling
             if self.crash_entity != "floor":
                 self.rotate()
 
-        # player velocity change
         if self.vel_y < self.max_vel_y:
             self.vel_y += self.acc_y
 
     def rotate(self) -> None:
-        """Rotate the player."""
+        """Advance the rotation angle."""
         self.rot = clamp(self.rot + self.vel_rot, self.rot_min, self.rot_max)
 
     def tick(self) -> None:
-        """Update the player."""
+        """Update the player for one frame."""
         if self.mode == PlayerMode.SHM:
             self.tick_shm()
         elif self.mode == PlayerMode.NORMAL:
@@ -144,11 +152,11 @@ class Player(Entity):
 
     def render(self) -> None:
         """Draw the player."""
-        self.update_image()
+        self.update_animation()
         self.draw_player()
 
-    def update_image(self) -> None:
-        """Update the image of the player."""
+    def update_animation(self) -> None:
+        """Advance the wing-flap animation."""
         self.frame += 1
         if self.frame % 5 == 0:
             self.img_idx = next(self.img_gen)
@@ -157,17 +165,19 @@ class Player(Entity):
             self.h = self.image.get_height()
 
     def draw_player(self) -> None:
-        """Draw the player."""
+        """Blit the rotated player sprite."""
+        if self.image is None:
+            return
         rotated_image = pygame.transform.rotate(self.image, self.rot)
         rotated_rect = rotated_image.get_rect(center=self.rect.center)
-        self.config.screen.blit(rotated_image, rotated_rect)
+        self.config.require_screen().blit(rotated_image, rotated_rect)
 
     def stop_wings(self) -> None:
-        """Stop the wings."""
+        """Freeze the wing animation."""
         self.img_gen = cycle([self.img_idx])
 
     def flap(self) -> None:
-        """Flap the player."""
+        """Flap upward."""
         if self.y > self.min_y:
             self.vel_y = self.flap_acc
             self.flapped = True
@@ -175,12 +185,26 @@ class Player(Entity):
             self.config.sounds.wing.play()
 
     def crossed(self, pipe: Pipe) -> bool:
-        """Returns True if player crosses the pipe."""
+        """Check whether the player crossed a pipe this frame.
+
+        Args:
+            pipe: The pipe to test.
+
+        Returns:
+            True if the player's center passed the pipe's center this frame.
+        """
         return pipe.cx <= self.cx < pipe.cx - pipe.vel_x
 
     def collided(self, pipes: Pipes, floor: Floor) -> bool:
-        """Returns True if player collides with floor or pipes."""
-        # if player crashes into ground
+        """Check collision against the floor and all pipes.
+
+        Args:
+            pipes: The pipe set.
+            floor: The floor.
+
+        Returns:
+            True if the player collided with anything.
+        """
         if self.collide(floor):
             self.crashed = True
             self.crash_entity = "floor"
